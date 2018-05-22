@@ -1,0 +1,431 @@
+{
+	"stats_exporter": {
+		"report_type": [
+			"task",
+			"test"
+		],
+		"data_format": "csv",
+		"export_dir": "."
+	},
+	"num_replications": 3,
+	"run_order": "random",
+	"runs": [
+		{
+		},
+		{
+			"num_repetitions": 3,
+			"test": {
+				"type": [
+					"write",
+					"read"
+				],
+				"write_flush": true,
+				"write_flush_per_req": true,
+				"read_reorder_offset": 1,
+				"intra_test_barrier": true,
+				"inter_test_delay_secs": 1,
+				"file_mode": "NxN",
+				"file_name": "./test_opts_true",
+				"file_name_append_sequence_num": true,
+				"file_name_append_task_id": true,
+				"file_dir_per_task": true,
+				"file_keep": true,
+				"workload": {
+					"num_tasks": 4,
+					"offset": {
+						"access_pattern": "random",
+						"data_size_distrib": {
+							"unif": {
+								"min": "256K",
+								"max": "1048576"
+							}
+						},
+						"request_sizes": [
+							"262144"
+						]
+					}
+				},
+				"afio": {
+					"posix": {
+					}
+				}
+			}
+		},
+		{
+			"num_repetitions": 2,
+			"test": {
+				"type": [
+					"write"
+				],
+				"file_mode": "NxN",
+				"file_name": "./test_opts_false",
+				"workload": {
+					"num_tasks": 3,
+					"offset": {
+						"access_pattern": "sequential",
+						"data_sizes": [
+							"1M",
+							"2M"
+						],
+						"request_size_distrib": {
+							"norm": {
+								"mean": "512K",
+								"stdev": "65535"
+							}
+						}
+					}
+				},
+				"afio": {
+					"cstream": {
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 2,
+					"offset": {
+						"access_pattern": "sequential",
+						"data_sizes": [
+							"1M"
+						],
+						"request_sizes": [
+							"262144"
+						]
+					}
+				},
+				"afio": {
+					"mpiio": {
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 2,
+					"offset": {
+						"access_pattern": "random",
+						"data_sizes": [
+							"1M"
+						],
+						"request_sizes": [
+							"262144"
+						]
+					}
+				},
+				"afio": {
+					"mpiio": {
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"posix": {
+						"seek_rw_single_op": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true",
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "false",
+						"collective_io": "false",
+						"file_view": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "false",
+						"collective_io": "true",
+						"file_view": "false"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "false",
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true",
+						"collective_io": "false",
+						"file_view": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true",
+						"collective_io": "true",
+						"file_view": "false"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 2
+				},
+				"afio": {
+					"mpiio": {
+						"seek_rw_single_op": "true",
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "NxN",
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				},
+				"afio": {
+					"cstream": {
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				},
+				"afio": {
+					"mpiio": {
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"file_mode": "Nx1",
+				"file_name": "./test_mpiio_cart",
+				"file_keep": true,
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				},
+				"afio": {
+					"mpiio": {
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		}
+	]
+}

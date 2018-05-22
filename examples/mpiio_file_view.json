@@ -1,0 +1,44 @@
+{
+	"runs": [
+		{
+			"test": {
+				"type": [
+					"write"
+				],
+				"file_mode": "Nx1",
+				"file_name": "./test_mpiio_cart",
+				"file_keep": true,
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 5,
+						"var_types": [
+							"integer",
+							"double",
+							"float",
+							"long long",
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 2,
+							"dim_sizes": [
+								8,
+								16
+							],
+							"dim_divs": [
+								2,
+								2
+							]
+						}
+					}
+				},
+				"afio": {
+					"mpiio": {
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		}
+	]
+}
