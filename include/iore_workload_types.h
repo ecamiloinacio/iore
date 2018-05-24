@@ -103,6 +103,14 @@ typedef struct iore_wkld
 
 char *
 wkld2str (const iore_wkld_t *);
+char *
+wkldoset2str (const iore_wkld_oset_t *);
+char *
+wklddset2str (const iore_wkld_dset_t *);
+char *
+wklddsetvartypes2str (const enum iore_wkld_dset_var_type *, int);
+char *
+wklddsetcart2str (const iore_wkld_dset_cart_t *);
 
 /*** VARIABLES ***************************************************************/
 

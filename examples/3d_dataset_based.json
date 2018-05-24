@@ -1,0 +1,76 @@
+{
+	"runs": [
+		{
+			"test": {
+				"type": [
+					"write"
+				],
+				"file_mode": "Nx1",
+				"file_name": "./testfile",
+				"file_keep": true,
+				"file_name_append_sequence_num": true,
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 1,
+						"var_types": [
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 3,
+							"dim_sizes": [
+								6,
+								4,
+								2
+							],
+							"dim_divs": [
+								2,
+								2,
+								1
+							]
+						}
+					}
+				}
+			}
+		},
+		{
+			"test": {
+				"type": [
+					"write"
+				],
+				"file_mode": "Nx1",
+				"file_name": "./testfile",
+				"file_keep": true,
+				"file_name_append_sequence_num": true,
+				"workload": {
+					"num_tasks": 4,
+					"dataset": {
+						"num_vars": 1,
+						"var_types": [
+							"char"
+						],
+						"cartesian": {
+							"num_dims": 3,
+							"dim_sizes": [
+								6,
+								4,
+								2
+							],
+							"dim_divs": [
+								2,
+								2,
+								1
+							]
+						}
+					}
+				},
+				"afio": {
+					"mpiio": {
+						"collective_io": "true",
+						"file_view": "true"
+					}
+				}
+			}
+		}
+	]
+}

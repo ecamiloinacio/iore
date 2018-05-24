@@ -244,8 +244,10 @@ posix_write_dset (iore_file_t file, const void *buf, const iore_test_t *test)
 
   if (test->wkld.u.dset.type == IORE_WKLD_DSET_CARTESIAN)
     {
-      req_size = (test->wkld.u.dset._vars_size
-	  * test->wkld.u.dset.u.cart.my_dim_sizes[0]);
+      req_size =
+	  (test->wkld.u.dset._vars_size
+	      * test->wkld.u.dset.u.cart.my_dim_sizes[test->wkld.u.dset.u.cart.num_dims
+		  - 1]);
     }
   else /* unsupported dataset type */
     {
@@ -321,8 +323,10 @@ posix_read_dset (iore_file_t file, void *buf, const iore_test_t *test)
 
   if (test->wkld.u.dset.type == IORE_WKLD_DSET_CARTESIAN)
     {
-      req_size = (test->wkld.u.dset._vars_size
-	  * test->wkld.u.dset.u.cart.my_dim_sizes[0]);
+      req_size =
+	  (test->wkld.u.dset._vars_size
+	      * test->wkld.u.dset.u.cart.my_dim_sizes[test->wkld.u.dset.u.cart.num_dims
+		  - 1]);
     }
   else /* unsupported dataset type */
     {

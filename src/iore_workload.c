@@ -12,14 +12,13 @@
 #include "iore_test_types.h"
 #include "iore_prng.h"
 #include "iore_ctx.h"
+#include "iore_error.h"
+#include "iore_util.h"
 
 /*** DEFINES *****************************************************************/
 
-//#define WKLD_DATA_SIZE_DFLT 1048576
-//#define WKLD_REQ_SIZE_DFLT 262144
-// TODO: remove after tests
-#define WKLD_DATA_SIZE_DFLT 1
-#define WKLD_REQ_SIZE_DFLT 1
+#define WKLD_DATA_SIZE_DFLT 1048576
+#define WKLD_REQ_SIZE_DFLT 262144
 
 /*** FUNCTIONS ***************************************************************/
 
@@ -138,7 +137,7 @@ dset_to_off (const iore_wkld_dset_t *dset, enum iore_test_file_mode file_mode)
 
       unsigned int offs_len = 1;
       unsigned int i;
-      for (i = 1; i < cart->num_dims; i++)
+      for (i = 0; i < cart->num_dims - 1; i++)
 	offs_len *= cart->my_dim_sizes[i];
       offs = malloc (offs_len * sizeof(off_t));
       assert(offs);
@@ -150,39 +149,51 @@ dset_to_off (const iore_wkld_dset_t *dset, enum iore_test_file_mode file_mode)
 	  for (i = 0; i < cart->num_dims; i++)
 	    coord[i] = cart->my_start_coord[i];
 
+	  iore_debugf("offs_len = %u", offs_len);
+
 	  /* computes all offsets */
-	  size_t fac;
-	  unsigned int j;
+	  size_t prod;
+	  unsigned int j, k;
 	  for (i = 0; i < offs_len; i++)
 	    {
 	      offs[i] = 0;
-	      fac = dset->_vars_size;
-
-	      /* computes the offset for one coordinate of this task */
 	      for (j = 0; j < cart->num_dims; j++)
 		{
-		  if (j > 0)
-		    fac *= cart->g_dim_sizes[j - 1];
-		  offs[i] += coord[j] * fac;
+		  prod = coord[j];
+		  for (k = j + 1; k < cart->num_dims; k++)
+		    prod *= cart->g_dim_sizes[k];
+		  offs[i] += prod;
+		  iore_debugf(
+		      "i = %u, j = %u, prod = %zu, coord[%u] = %u, offs[%u] = %u",
+		      i, j, prod, j, coord[j], i, offs[i]);
 		}
+	      offs[i] *= dset->_vars_size;
+	      iore_debugf("before coord upd: %s", arrlld2str (offs, offs_len));
 
-	      /* updates coordinates of this task; coord[0] is fixed. */
-	      j = 1;
-	      coord[j]++;
-	      while (j < cart->num_dims
-		  && coord[j]
-		      == (cart->my_start_coord[j] + cart->my_dim_sizes[j]))
+	      /* updates coords for the next offset computation */
+	      int l = cart->num_dims - 2;
+	      coord[l]++;
+	      iore_debugf("before while: l = %d, coord[%d] = %u", l, l,
+			  coord[l]);
+	      while (l > 0
+		  && (coord[l]
+		      == (cart->my_start_coord[l] + cart->my_dim_sizes[l])))
 		{
-		  coord[j] = cart->my_start_coord[j];
-		  j++;
-		  coord[j]++;
+		  coord[l] = cart->my_start_coord[l];
+		  l--;
+		  coord[l]++;
+		  iore_debugf("inside while: l = %d, coord[%d] = %u", l, l,
+			      coord[l]);
 		}
 	    }
+
+	  iore_debugf("final offs: %s", arrlld2str (offs, offs_len));
 	}
       else if (file_mode == IORE_TEST_FMODE_NXN)
 	{
 	  for (i = 0; i < offs_len; i++)
-	    offs[i] = i * cart->my_dim_sizes[0] * dset->_vars_size;
+	    offs[i] = i * cart->my_dim_sizes[cart->num_dims - 1]
+		* dset->_vars_size;
 	}
     }
 

@@ -726,7 +726,7 @@ test_file_prep (iore_test_t *test, unsigned int rpl_id, unsigned int run_id,
 			rpt_id);
       if (nbytes == -1 || nbytes > PATH_MAX)
 	{
-	  iore_error_all ("Failed appending sequence numbers to file name.");
+	  iore_error_all("Failed appending sequence numbers to file name.");
 	  free (swp);
 	  return IORE_FAILURE;
 	}
@@ -741,7 +741,7 @@ test_file_prep (iore_test_t *test, unsigned int rpl_id, unsigned int run_id,
       nbytes = snprintf(swp, PATH_MAX, "%s.%d", base_name, task_id);
       if (nbytes == -1 || nbytes > PATH_MAX)
 	{
-	  iore_error_all ("Failed appending the task id to file name.");
+	  iore_error_all("Failed appending the task id to file name.");
 	  free (swp);
 	  return IORE_FAILURE;
 	}
@@ -756,8 +756,8 @@ test_file_prep (iore_test_t *test, unsigned int rpl_id, unsigned int run_id,
       nbytes = snprintf(swp, PATH_MAX, "%s/task.%d", dir_name, task_id);
       if (nbytes == -1 || nbytes > PATH_MAX)
 	{
-	  iore_errorf_all ("Failed appeding 'task.%d' to file parent dir.",
-			   task_id);
+	  iore_errorf_all("Failed appeding 'task.%d' to file parent dir.",
+			  task_id);
 	  free (swp);
 	  return IORE_FAILURE;
 	}
@@ -766,7 +766,7 @@ test_file_prep (iore_test_t *test, unsigned int rpl_id, unsigned int run_id,
       /* checks if the directory exists */
       if (mkdir (dir_name, S_IRWXU) && errno != EEXIST)
 	{
-	  iore_errorf_all ("Failed creating directory '%s'.", dir_name);
+	  iore_errorf_all("Failed creating directory '%s'.", dir_name);
 	  free (swp);
 	  return IORE_FAILURE;
 	}
@@ -778,7 +778,7 @@ test_file_prep (iore_test_t *test, unsigned int rpl_id, unsigned int run_id,
   nbytes = snprintf(swp, PATH_MAX, "%s/%s", dir_name, base_name);
   if (nbytes == -1 || nbytes > PATH_MAX)
     {
-      iore_error_all ("Failed composing file name.");
+      iore_error_all("Failed composing file name.");
       free (swp);
       return IORE_FAILURE;
     }
@@ -799,7 +799,7 @@ test_file_post (iore_test_t *test, iore_file_t *file)
       char *dir_name = dirname (file_name);
       if (rmdir (dir_name))
 	{
-	  iore_errorf_all ("Failed removing directory '%s'.", dir_name);
+	  iore_errorf_all("Failed removing directory '%s'.", dir_name);
 	  free (file_name);
 	  rerr = IORE_FAILURE;
 	}

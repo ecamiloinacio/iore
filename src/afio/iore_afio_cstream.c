@@ -125,7 +125,7 @@ cstream_write_oset (iore_file_t file, const void *buf, const off_t *offs,
 	  if (req_size > max_req_size)
 	    req_size = max_req_size;
 	  if (req_size > remaining)
-	  	    req_size = remaining;
+	    req_size = remaining;
 	  nmemb = fwrite (buf, sizeof(char), req_size, fp);
 	  xferd = nmemb * sizeof(char);
 	  if (xferd < req_size)
@@ -171,7 +171,7 @@ cstream_read_oset (iore_file_t file, void *buf, const off_t *offs,
 	  if (req_size > max_req_size)
 	    req_size = max_req_size;
 	  if (req_size > remaining)
-	  	    req_size = remaining;
+	    req_size = remaining;
 	  nmemb = fread (buf, sizeof(char), req_size, fp);
 	  xferd = nmemb * sizeof(char);
 	  if (xferd < req_size)
@@ -202,8 +202,10 @@ cstream_write_dset (iore_file_t file, const void *buf, const iore_test_t *test)
 
   if (test->wkld.u.dset.type == IORE_WKLD_DSET_CARTESIAN)
     {
-      req_size = (test->wkld.u.dset._vars_size
-	  * test->wkld.u.dset.u.cart.my_dim_sizes[0]);
+      req_size =
+	  (test->wkld.u.dset._vars_size
+	      * test->wkld.u.dset.u.cart.my_dim_sizes[test->wkld.u.dset.u.cart.num_dims
+		  - 1]);
     }
   else /* unsupported dataset type */
     {
@@ -260,8 +262,10 @@ cstream_read_dset (iore_file_t file, void *buf, const iore_test_t *test)
 
   if (test->wkld.u.dset.type == IORE_WKLD_DSET_CARTESIAN)
     {
-      req_size = (test->wkld.u.dset._vars_size
-	  * test->wkld.u.dset.u.cart.my_dim_sizes[0]);
+      req_size =
+	  (test->wkld.u.dset._vars_size
+	      * test->wkld.u.dset.u.cart.my_dim_sizes[test->wkld.u.dset.u.cart.num_dims
+		  - 1]);
     }
   else /* unsupported dataset type */
     {

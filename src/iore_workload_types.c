@@ -18,17 +18,6 @@
 #define WKLDDSET2STR_FORMAT "dataset (%p) { num_vars = %u, var_types (%p) = [ %s ], type = %s, my_size = %zu, _vars_size = %zu }"
 #define WKLDDSETCART2STR_FORMAT "cartesian (%p) { num_dims = %u, g_dim_sizes (%p) = [ %s ], g_dim_divs (%p) = [ %s ], my_dim_sizes (%p) = [ %s ], my_start_coord  (%p) = [ %s ] }"
 
-/*** PROTOTYPES **************************************************************/
-
-static char *
-wkldoset2str (const iore_wkld_oset_t *);
-static char *
-wklddset2str (const iore_wkld_dset_t *);
-static char *
-wklddsetvartypes2str (const enum iore_wkld_dset_var_type *, int);
-static char *
-wklddsetcart2str (const iore_wkld_dset_cart_t *);
-
 /*** VARIABLES ***************************************************************/
 
 const char * const wkld_type_lbl[IORE_WKLD_LENGTH] =
@@ -68,7 +57,7 @@ wkld2str (const iore_wkld_t *wkld)
   return str;
 } /* wkld2str () */
 
-static char *
+char *
 wkldoset2str (const iore_wkld_oset_t *oset)
 {
   char *str = NULL;
@@ -105,7 +94,7 @@ wkldoset2str (const iore_wkld_oset_t *oset)
   return str;
 } /* wkldoset2str () */
 
-static char *
+char *
 wklddset2str (const iore_wkld_dset_t *dset)
 {
   char *str = NULL;
@@ -134,7 +123,7 @@ wklddset2str (const iore_wkld_dset_t *dset)
   return str;
 } /* wklddset2str () */
 
-static char *
+char *
 wklddsetvartypes2str (const enum iore_wkld_dset_var_type *var_types, int len)
 {
   char *str = NULL;
@@ -165,7 +154,7 @@ wklddsetvartypes2str (const enum iore_wkld_dset_var_type *var_types, int len)
   return str;
 } /* wklddsetvartypes2str () */
 
-static char *
+char *
 wklddsetcart2str (const iore_wkld_dset_cart_t *cart)
 {
   char *str = NULL;
