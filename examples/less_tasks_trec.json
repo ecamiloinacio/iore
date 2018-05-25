@@ -1,0 +1,76 @@
+{
+	"runs": [
+		{
+			"num_repetitions": 1,
+			"test": {
+				"file_mode": "Nx1",
+				"file_name": "./testfile",
+				"file_name_append_sequence_num": true,
+				"workload": {
+					"num_tasks": 4,
+					"offset": {
+						"access_pattern": "sequential",
+						"data_sizes": [
+							"100M"
+						],
+						"request_sizes": [
+							"1K"
+						]
+					}
+				},
+				"afio": {
+					"posix": {
+					}
+				}
+			}
+		},
+		{
+			"num_repetitions": 1,
+			"test": {
+				"file_mode": "Nx1",
+				"file_name": "./testfile",
+				"file_name_append_sequence_num": true,
+				"workload": {
+					"num_tasks": 2,
+					"offset": {
+						"access_pattern": "sequential",
+						"data_sizes": [
+							"100M"
+						],
+						"request_sizes": [
+							"1K"
+						]
+					}
+				},
+				"afio": {
+					"posix": {
+					}
+				}
+			}
+		},
+		{
+			"num_repetitions": 1,
+			"test": {
+				"file_mode": "Nx1",
+				"file_name": "./testfile",
+				"file_name_append_sequence_num": true,
+				"workload": {
+					"num_tasks": 4,
+					"offset": {
+						"access_pattern": "sequential",
+						"data_sizes": [
+							"100M"
+						],
+						"request_sizes": [
+							"1K"
+						]
+					}
+				},
+				"afio": {
+					"posix": {
+					}
+				}
+			}
+		}
+	]
+}

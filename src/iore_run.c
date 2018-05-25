@@ -64,15 +64,14 @@ run_exec (iore_run_t *this, unsigned int rpl_id)
     {
       unsigned int i;
       for (i = 1; i <= this->num_repetitions && !rerr; i++)
-	{
-	  rerr = run_rept_exec (this, rpl_id, i);
-	  MPI_Barrier (ctx.comm);
-	}
+	rerr = run_rept_exec (this, rpl_id, i);
     }
   rerr = run_post ();
 
   iore_trec_run_t *trec_run = trec_run_stop ();
   run_show_summary (trec_run);
+
+  MPI_Barrier (ctx.comm);
 
   return rerr;
 } /* run_exec () */
@@ -132,6 +131,8 @@ run_rept_exec (iore_run_t *run, unsigned int rpl_id, unsigned int rpt_id)
 
   iore_trec_run_rept_t *trec_run_rept = trec_run_rept_stop ();
   run_rept_show_summary (trec_run_rept);
+
+  MPI_Barrier (ctx.comm);
 
   return rerr;
 } /* run_rept_exec () */
