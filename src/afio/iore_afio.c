@@ -17,10 +17,16 @@ extern const iore_afio_vtable_t afio_cstream;
 #ifdef WITH_MPIIO_AFIO
 extern const iore_afio_vtable_t afio_mpiio;
 #endif
+#ifdef WITH_PROTO_AFIO
+extern const iore_afio_vtable_t afio_proto;
+#endif
 const iore_afio_vtable_t *afio_pool[IORE_AFIO_LENGTH] =
   { &afio_posix, &afio_cstream
 #ifdef WITH_MPIIO_AFIO
     , &afio_mpiio
+#endif
+#ifdef WITH_PROTO_AFIO
+    , &afio_proto
 #endif
 };
 

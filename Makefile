@@ -1,5 +1,6 @@
 #**** User options ************************************************************
 WITH_MPIIO_AFIO = true
+WITH_PROTO_AFIO = false
 WITH_ORAGENFS_AFSB = false
 WITH_LUSTRE_AFSB = false
 
@@ -44,6 +45,10 @@ ifeq ($(WITH_MPIIO_AFIO), true)
 	CFLAGS += -DWITH_MPIIO_AFIO
 endif
 
+ifeq ($(WITH_PROTO_AFIO), true)
+	CFLAGS += -DWITH_PROTO_AFIO
+endif
+
 ifeq ($(WITH_ORANGEFS_AFSB), true)
 	CFLAGS += -DWITH_ORANGEFS_AFSB
 endif
@@ -63,6 +68,9 @@ AFIO += $(BUILDDIRAFIO)/iore_afio_posix.o
 AFIO +=	$(BUILDDIRAFIO)/iore_afio_cstream.o
 ifeq ($(WITH_MPIIO_AFIO), true)
 	AFIO += $(BUILDDIRAFIO)/iore_afio_mpiio.o
+endif
+ifeq ($(WITH_PROTO_AFIO), true)
+	AFIO += $(BUILDDIRAFIO)/iore_afio_proto.o
 endif
 
 # Abstract Storage File Backend (AFSB)

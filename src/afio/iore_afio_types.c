@@ -18,6 +18,9 @@ const char * const afio_lbl[IORE_AFIO_LENGTH] =
 #ifdef WITH_MPIIO_AFIO
     , "mpiio"
 #endif
+#ifdef WITH_PROTO_AFIO
+    , "proto"
+#endif
 };
 
 /*** FUNCTIONS ***************************************************************/
