@@ -56,7 +56,7 @@ proto_create (iore_file_t *file, const iore_test_t *test)
   int stripe_off = -1;
   char mnt[PATH_MAX];
 
-  if (test->file_mode == IORE_TEST_FMODE_NX1)
+  if (test->file_mode == IORE_TEST_FMODE_NXN)
     {
       /* TODO: must fix for basename different from mount point */
       strcpy(mnt, basename (file->name));
@@ -74,7 +74,7 @@ proto_create (iore_file_t *file, const iore_test_t *test)
 
       fd = llapi_file_open (test->file_name, oflag, mode, 0, stripe_off, 0, 0);
     }
-  else /* IORE_TEST_FMODE_NXN */
+  else /* IORE_TEST_FMODE_NX1 */
     {
       fd = open (file->name, oflag, mode);
     }
