@@ -40,6 +40,7 @@ CFLAGS += -I $(LIBDIR)/tinymt
 CFLAGS += -I $(LIBDIR)/json-parser
 CFLAGS += -std=gnu99
 CFLAGS += -lm
+CFLAGS += -llustreapi # temporary flag for load balancing analysis
 
 ifeq ($(WITH_MPIIO_AFIO), true)
 	CFLAGS += -DWITH_MPIIO_AFIO

@@ -307,7 +307,7 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
    *
    * TODO: do not merge into MASTER branch.
    */
-  struct lov_user_md lum;
+  struct lov_user_md *lum = NULL;
   int *l_load_counter, *g_load_counter;
   int i;
   int nosts;
@@ -316,10 +316,10 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
   llapi_search_mounts (file.name, 0, mntdir, fsname);
   llapi_get_obd_count (mntdir, &nosts, 0);
 
-  l_load_counter = malloc (nosts * sizeof(int));
-  memset(l_load_counter, 0, nosts * sizeof(int));
+  l_load_counter = calloc (nosts, sizeof(int));
+  g_load_counter = calloc (nosts, sizeof(int));
 
-  g_load_counter = malloc (nosts * sizeof(int));
+  lum = malloc(sizeof(struct lov_user_md));
   /**
    *  END of temporary code
    *
@@ -365,9 +365,9 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
 	       *
 	       * TODO: do not merge into MASTER branch.
 	       */
-	      llapi_file_get_stripe (file.name, &lum);
-	      for (i = 0; i < lum.lmm_stripe_count; i++)
-		l_load_counter[lum.lmm_objects[i].l_ost_idx]++;
+	      llapi_file_get_stripe (file.name, lum);
+	      for (i = 0; i < lum->lmm_stripe_count; i++)
+		l_load_counter[lum->lmm_objects[i].l_ost_idx]++;
 	      /**
 	       *  END of temporary code
 	       *
