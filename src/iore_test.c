@@ -319,7 +319,7 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
   l_load_counter = calloc (nosts, sizeof(int));
   g_load_counter = calloc (nosts, sizeof(int));
 
-  lum = malloc(sizeof(struct lov_user_md));
+  lum = malloc (sizeof(struct lov_user_md));
   /**
    *  END of temporary code
    *
@@ -403,8 +403,12 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
    */
   MPI_Reduce (l_load_counter, g_load_counter, nosts, MPI_INT, MPI_SUM,
 	      (IORE_MASTER_TASK), ctx.comm);
-  for (i = 0; i < nosts; i++)
-    printf ("%d,%d\n", i, g_load_counter[i]);
+  if (ctx.task_id == IORE_MASTER_TASK)
+    {
+      puts("ost_idx,stripe_count\n");
+      for (i = 0; i < nosts; i++)
+	printf ("%d,%d\n", i, g_load_counter[i]);
+    }
 
   free (l_load_counter);
   free (g_load_counter);
