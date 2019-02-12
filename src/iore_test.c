@@ -15,6 +15,9 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+/* TODO: do not merge into MASTER branch */
+#include <lustre/lustreapi.h>
+
 #include "iore_test_types.h"
 #include "iore_workload.h"
 #include "iore_afio.h"
@@ -299,6 +302,30 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
   bool intra_test_barrier = test->intra_test_barrier;
   ssize_t nbytes = 0;
 
+  /**
+   * Temporary code for load balancing analysis on Lustre OSTs.
+   *
+   * TODO: do not merge into MASTER branch.
+   */
+  struct lov_user_md lum;
+  int *l_load_counter, *g_load_counter;
+  int i;
+  int nosts;
+  char mntdir[1024], fsname[1024];
+
+  llapi_search_mounts (file.name, 0, mntdir, fsname);
+  llapi_get_obd_count (mntdir, &nosts, 0);
+
+  l_load_counter = malloc (nosts * sizeof(int));
+  memset(l_load_counter, 0, nosts * sizeof(int));
+
+  g_load_counter = malloc (nosts * sizeof(int));
+  /**
+   *  END of temporary code
+   *
+   *  TODO: do not merge into MASTER branch.
+   */
+
   MPI_Barrier (ctx.comm);
 
   /* creates */
@@ -333,6 +360,20 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
 	    iore_fatalf("Failed closing file '%s'", file.name);
 	  else
 	    {
+	      /**
+	       * Temporary code for load balancing analysis on Lustre OSTs.
+	       *
+	       * TODO: do not merge into MASTER branch.
+	       */
+	      llapi_file_get_stripe (file.name, &lum);
+	      for (i = 0; i < lum.lmm_stripe_count; i++)
+		l_load_counter[lum.lmm_objects[i].l_ost_idx]++;
+	      /**
+	       *  END of temporary code
+	       *
+	       *  TODO: do not merge into MASTER branch.
+	       */
+
 	      if (!test->type.read && !test->file_keep)
 		{
 		  MPI_Barrier (ctx.comm);
@@ -354,6 +395,24 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
     } /* end of write block */
 
   MPI_Barrier (ctx.comm);
+
+  /**
+   * Temporary code for load balancing analysis on Lustre OSTs.
+   *
+   * TODO: do not merge into MASTER branch.
+   */
+  MPI_Reduce (l_load_counter, g_load_counter, nosts, MPI_INT, MPI_SUM,
+	      (IORE_MASTER_TASK), ctx.comm);
+  for (i = 0; i < nosts; i++)
+    printf ("%d,%d\n", i, g_load_counter[i]);
+
+  free (l_load_counter);
+  free (g_load_counter);
+  /**
+   *  END of temporary code
+   *
+   *  TODO: do not merge into MASTER branch.
+   */
 
   return rerr;
 } /* test_oset_write_exec () */
