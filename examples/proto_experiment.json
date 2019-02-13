@@ -1,0 +1,29 @@
+{
+	"runs": [
+		{
+			"test": {
+				"type": [
+					"write"
+				],
+				"file_mode": "NxN",
+				"file_name": "/mnt/lustre/protofile",
+				"file_keep": false,
+				"workload": {
+					"num_tasks": 30,
+					"offset": {
+						"data_sizes": [
+							"32M"
+						],
+						"request_sizes": [
+							"32M"
+						]
+					}
+				},
+				"afio": {
+					"proto": {
+					}
+				}
+			}
+		}
+	]
+}

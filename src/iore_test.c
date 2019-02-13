@@ -405,11 +405,12 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
 	      (IORE_MASTER_TASK), ctx.comm);
   if (ctx.task_id == IORE_MASTER_TASK)
     {
-      puts("ost_idx,stripe_count\n");
+      puts("ost_idx,stripe_count");
       for (i = 0; i < nosts; i++)
 	printf ("%d,%d\n", i, g_load_counter[i]);
     }
 
+  free (lum);
   free (l_load_counter);
   free (g_load_counter);
   /**
