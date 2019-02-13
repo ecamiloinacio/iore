@@ -308,6 +308,7 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
    * TODO: do not merge into MASTER branch.
    */
   struct lov_user_md *lum = NULL;
+  int lum_size;
   int *l_load_counter, *g_load_counter;
   int i;
   int nosts;
@@ -319,7 +320,9 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
   l_load_counter = calloc (nosts, sizeof(int));
   g_load_counter = calloc (nosts, sizeof(int));
 
-  lum = malloc (sizeof(struct lov_user_md));
+  lum_size = sizeof(struct lov_user_md_v1)
+      + nosts * sizeof(struct lov_user_ost_data_v1);
+  lum = malloc (lum_size);
   /**
    *  END of temporary code
    *
@@ -405,7 +408,7 @@ test_oset_write_exec (iore_test_t *test, iore_file_t file, const char *buf,
 	      (IORE_MASTER_TASK), ctx.comm);
   if (ctx.task_id == IORE_MASTER_TASK)
     {
-      puts("ost_idx,stripe_count");
+      puts ("ost_idx,stripe_count");
       for (i = 0; i < nosts; i++)
 	printf ("%d,%d\n", i, g_load_counter[i]);
     }
