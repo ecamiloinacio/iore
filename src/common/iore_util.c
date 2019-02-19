@@ -404,7 +404,8 @@ vstrfmt (const char *fmt, va_list ap)
   if (len > 0)
     {
       len++;
-      str = pioss_malloc (len);
+      str = malloc (len);
+      assert(str);
       vsnprintf(str, len, fmt, ap);
     }
 
