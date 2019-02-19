@@ -95,7 +95,7 @@ ofsproto_create (iore_file_t *file, const iore_test_t *test)
 
       oflag |= O_HINTS;
 
-      fd = pvfs_open (test->file_name, oflag, mode, hint);
+      fd = pvfs_open (file->name, oflag, mode, hint);
     }
   else /* IORE_TEST_FMODE_NX1 */
     {
