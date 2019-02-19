@@ -339,7 +339,8 @@ char *
 coallesce_str (const char **a, int len, char *sep)
 {
   char *str = NULL;
-  int ttl_len, sep_len, i;
+  char *str_ptr;
+  int ttl_len, sep_len, i, s;
 
   if (a && len > 0 && sep)
     {
@@ -353,12 +354,19 @@ coallesce_str (const char **a, int len, char *sep)
 
       str = malloc (ttl_len);
       assert(str);
+      str_ptr = str;
 
-      str = stpncpy(str, a[0], strlen (a[0]));
+      s = strlen (a[0]);
+      strncpy(str_ptr, a[0], s);
+      str_ptr += s;
       for (i = 1; i < len; i++)
 	{
-	  str = stpncpy(str, sep, sep_len);
-	  str = stpncpy(str, a[0], strlen (a[0]));
+	  strncpy(str_ptr, sep, sep_len);
+	  str_ptr += sep_len;
+
+	  s = strlen (a[0]);
+	  strncpy(str, a[0], s);
+	  str_ptr += s;
 	}
     }
 
@@ -389,7 +397,7 @@ coallesce_uint (const unsigned int *a, int len, char *sep)
   return str;
 } /* coallesce_uint ()
 
-/*** STATIC FUNCTIONS *********************************************************/
+ /*** STATIC FUNCTIONS *********************************************************/
 
 static char *
 vstrfmt (const char *fmt, va_list ap)
@@ -398,9 +406,9 @@ vstrfmt (const char *fmt, va_list ap)
   char *str;
   int len;
 
-  va_copy(copy, ap);
+  va_copy (copy, ap);
   len = vsnprintf(str, 0, fmt, copy);
-  va_end(copy);
+  va_end (copy);
   if (len > 0)
     {
       len++;
