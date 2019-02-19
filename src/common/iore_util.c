@@ -364,13 +364,13 @@ coallesce_str (const char **a, int len, char *sep)
 	  strncpy(str_ptr, sep, sep_len);
 	  str_ptr += sep_len;
 
-	  s = strlen (a[0]);
-	  strncpy(str, a[0], s);
+	  s = strlen (a[i]);
+	  strncpy(str_ptr, a[i], s);
 	  str_ptr += s;
 	}
     }
 
-  return &str[0];
+  return str;
 } /* coallesce_str () */
 
 char *
