@@ -26,6 +26,9 @@ enum iore_afio_type
 #ifdef WITH_MPIIO_AFIO
   IORE_AFIO_MPIIO, /* MPI-IO functions */
 #endif
+#ifdef WITH_OFSPROTO_AFIO
+  IORE_AFIO_OFSPROTO, /* OrangeFS prototype functions */
+#endif
   IORE_AFIO_LENGTH
 };
 
