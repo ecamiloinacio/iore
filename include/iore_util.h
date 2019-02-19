@@ -45,5 +45,11 @@ char *
 arrs2str (char **, int, size_t);
 char *
 arrlld2str (long long int *, int);
+char *
+strfmt (const char *fmt, ...);
+char *
+coallesce_str (const char **a, int len, char *sep);
+char *
+coallesce_uint (const unsigned int *a, int len, char *sep);
 
 #endif /* INCLUDE_IORE_UTIL_H_ */

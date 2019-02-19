@@ -31,12 +31,12 @@ char *
 itoa (int i)
 {
   char *a = NULL;
-  int nbytes = snprintf (a, 0, "%d", i);
+  int nbytes = snprintf(a, 0, "%d", i);
   if (nbytes > 0)
     {
       a = malloc (nbytes + 1);
       assert(a);
-      snprintf (a, nbytes + 1, "%d", i);
+      snprintf(a, nbytes + 1, "%d", i);
     }
 
   return a;
@@ -46,12 +46,12 @@ char *
 zutoa (size_t zu)
 {
   char *a = NULL;
-  int nbytes = snprintf (a, 0, "%zu", zu);
+  int nbytes = snprintf(a, 0, "%zu", zu);
   if (nbytes > 0)
     {
       a = malloc (nbytes + 1);
       assert(a);
-      snprintf (a, nbytes + 1, "%zu", zu);
+      snprintf(a, nbytes + 1, "%zu", zu);
     }
 
   return a;
@@ -81,9 +81,9 @@ shuffle (void *ptr, unsigned int n, size_t size, unsigned int seed)
 	  j = prng_next_uint (prng);
 	  if (j != i)
 	    {
-	      memcpy (swp, ptr + j * size, size);
-	      memcpy (ptr + j * size, ptr + i * size, size);
-	      memcpy (ptr + i * size, swp, size);
+	      memcpy(swp, ptr + j * size, size);
+	      memcpy(ptr + j * size, ptr + i * size, size);
+	      memcpy(ptr + i * size, swp, size);
 	    }
 	}
       free (prng);
@@ -151,7 +151,7 @@ hrbytesd (double bytes, char *hr, size_t len)
       div = KIBIBYTE;
       unit = "KiB/s";
     }
-  snprintf (hr, len, "%7.3f %s", bytes / div, unit);
+  snprintf(hr, len, "%7.3f %s", bytes / div, unit);
 } /* hrbytesd () */
 
 char *
@@ -169,12 +169,12 @@ arru2str (const unsigned int *arru, int len)
       int i;
       for (i = 0; i < len; i++)
 	{
-	  swp_len = snprintf (swp_l[i], 0, "%u", arru[i]);
+	  swp_len = snprintf(swp_l[i], 0, "%u", arru[i]);
 	  if (swp_len > 0)
 	    {
 	      swp_l[i] = malloc (swp_len + 1);
 	      assert(swp_l[i]);
-	      snprintf (swp_l[i], swp_len + 1, "%u", arru[i]);
+	      snprintf(swp_l[i], swp_len + 1, "%u", arru[i]);
 	      str_len += swp_len;
 	    }
 	}
@@ -232,12 +232,12 @@ arrd2str (const double *arrd, int len)
       int i;
       for (i = 0; i < len; i++)
 	{
-	  swp_len = snprintf (swp_l[i], 0, "%lf", arrd[i]);
+	  swp_len = snprintf(swp_l[i], 0, "%lf", arrd[i]);
 	  if (swp_len > 0)
 	    {
 	      swp_l[i] = malloc (swp_len + 1);
 	      assert(swp_l[i]);
-	      snprintf (swp_l[i], swp_len + 1, "%lf", arrd[i]);
+	      snprintf(swp_l[i], swp_len + 1, "%lf", arrd[i]);
 	      str_len += swp_len;
 	    }
 	}
@@ -274,7 +274,7 @@ arrs2str (char **arrs, int len, size_t str_len)
 	    }
 
 	  size_t s_len = strlen (arrs[i]);
-	  strncpy (str_ptr, arrs[i], s_len);
+	  strncpy(str_ptr, arrs[i], s_len);
 	  str_ptr += s_len;
 	}
     }
@@ -297,12 +297,12 @@ arrlld2str (long long int *arrlld, int len)
       int i;
       for (i = 0; i < len; i++)
 	{
-	  swp_len = snprintf (swp_l[i], 0, "%lld", arrlld[i]);
+	  swp_len = snprintf(swp_l[i], 0, "%lld", arrlld[i]);
 	  if (swp_len > 0)
 	    {
 	      swp_l[i] = malloc (swp_len + 1);
 	      assert(swp_l[i]);
-	      snprintf (swp_l[i], swp_len + 1, "%lld", arrlld[i]);
+	      snprintf(swp_l[i], swp_len + 1, "%lld", arrlld[i]);
 	      str_len += swp_len;
 	    }
 	}
@@ -315,3 +315,71 @@ arrlld2str (long long int *arrlld, int len)
 
   return str;
 } /* arrlld2str () */
+
+char *
+strfmt (const char *fmt, ...)
+{
+  va_list ap;
+  char *str;
+
+  va_start (ap, fmt);
+  str = vstrfmt (fmt, ap);
+  va_end (ap);
+
+  return str;
+} /* strfmt () */
+
+char *
+coallesce_str (const char **a, int len, char *sep)
+{
+  char *str = NULL;
+  int ttl_len, sep_len, i;
+
+  if (a && len > 0 && sep)
+    {
+      ttl_len = 0;
+      sep_len = strlen (sep);
+
+      for (i = 0; i < len; i++)
+	ttl_len += strlen (a[i]);
+      ttl_len += (len - 1) * sep_len; /* for one separator between every two elements */
+      ttl_len++; /* for the terminating NUL character */
+
+      str = malloc (ttl_len);
+      assert(str);
+
+      str = stpncpy(str, a[0], strlen (a[0]));
+      for (i = 1; i < len; i++)
+	{
+	  str = stpncpy(str, sep, sep_len);
+	  str = stpncpy(str, a[0], strlen (a[0]));
+	}
+    }
+
+  return &str[0];
+} /* coallesce_str () */
+
+char *
+coallesce_uint (const unsigned int *a, int len, char *sep)
+{
+  char *str = NULL;
+  char **str_a;
+  int i;
+
+  if (a && len > 0 && sep)
+    {
+      str_a = malloc (len * sizeof(char *));
+      assert(str_a);
+      for (i = 0; i < len; i++)
+	str_a[i] = strfmt ("%u", a[i]);
+
+      str = coallesce_str (str_a, len, sep);
+
+      for (i = 0; i < len; i++)
+	free (str_a[i]);
+      free (str_a);
+    }
+
+  return str;
+} /* coallesce_uint ()
+
