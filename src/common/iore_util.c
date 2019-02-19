@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <time.h>
 
@@ -17,6 +18,11 @@
 /*** DEFINES *****************************************************************/
 
 #define CURTIMESTR_MAX_SIZE 25
+
+/*** PROTOTYPES ***************************************************************/
+
+static char *
+vstrfmt (const char *fmt, va_list ap);
 
 /*** FUNCTIONS ***************************************************************/
 
@@ -383,3 +389,24 @@ coallesce_uint (const unsigned int *a, int len, char *sep)
   return str;
 } /* coallesce_uint ()
 
+/*** STATIC FUNCTIONS *********************************************************/
+
+static char *
+vstrfmt (const char *fmt, va_list ap)
+{
+  va_list copy;
+  char *str;
+  int len;
+
+  va_copy(copy, ap);
+  len = vsnprintf(str, 0, fmt, copy);
+  va_end(copy);
+  if (len > 0)
+    {
+      len++;
+      str = pioss_malloc (len);
+      vsnprintf(str, len, fmt, ap);
+    }
+
+  return str;
+} /* vstrfmt () */
