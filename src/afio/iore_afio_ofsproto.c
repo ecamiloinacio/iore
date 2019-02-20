@@ -40,6 +40,10 @@ ofsproto_close (iore_file_t *);
 int
 ofsproto_remove (iore_file_t);
 
+static int
+ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
+		     mode_t mode);
+
 /*** VARIABLES ***************************************************************/
 
 const iore_afio_vtable_t afio_ofsproto =
@@ -53,54 +57,22 @@ ofsproto_create (iore_file_t *file, const iore_test_t *test)
 {
   int rerr = IORE_SUCCESS;
 
-  int nosts, first_ost, stride, fd;
+  int fd;
   int oflag = O_CREAT | O_WRONLY;
   mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-  int stripe_off;
-  PVFS_hint hint = NULL;
-  int layout = PVFS_SYS_LAYOUT_LIST;
-  /* TODO: get from AFSB parameters */
-  unsigned int num_dfiles = 1;
-  char *serverlist;
-  unsigned int *u_serverlist;
 
   if (test->file_mode == IORE_TEST_FMODE_NXN)
     {
-      /* TODO: use OrangeFS API to get the number of data servers */
-      nosts = atoi (getenv ("OFS_NUM_DSERV"));
-      if (ctx.task_id == IORE_MASTER_TASK)
-	{
-	  /* TODO: replace RNG */
-	  first_ost = rand () % nosts;
-	}
-      MPI_Bcast (&first_ost, 1, MPI_INT, 0, MPI_COMM_WORLD);
-      stride = nosts / test->wkld.num_tasks;
-      if (stride < 1)
-	stride = 1;
-      stripe_off = (first_ost + ctx.task_id * stride) % nosts;
-
-      u_serverlist = calloc (num_dfiles + 1, sizeof(unsigned int));
-      assert(u_serverlist);
-      u_serverlist[0] = num_dfiles;
-      u_serverlist[1] = stripe_off;
-      /* TODO: implement loop for num_dfiles > 1 */
-      serverlist = coallesce_uint (u_serverlist, num_dfiles + 1, ":");
-      free (u_serverlist);
-
-      PVFS_hint_add (&hint, PVFS_HINT_LAYOUT_NAME, sizeof(layout), &layout);
-      PVFS_hint_add (&hint, PVFS_HINT_DFILE_COUNT_NAME, sizeof(num_dfiles),
-		     &num_dfiles);
-      PVFS_hint_add (&hint, PVFS_HINT_SERVERLIST_NAME, strlen (serverlist),
-		     serverlist);
-
-      oflag |= O_HINTS;
-
-      fd = pvfs_open (file->name, oflag, mode, hint);
+      /**
+       * Create the file with the OrangeFS API, closes it, then open it again
+       * with the POSIX syscall. This is needed in order to other functions to
+       * be able to use POSIX syscalls as well.
+       */
+      fd = ofsproto_create_nxn (file, test, oflag, mode);
+      pvfs_close (fd);
     }
-  else /* IORE_TEST_FMODE_NX1 */
-    {
-      fd = open (file->name, oflag, mode);
-    }
+
+  fd = open (file->name, oflag, mode);
 
   if (fd >= 0)
     file->hdle.fint = fd;
@@ -155,22 +127,14 @@ ofsproto_write_oset (iore_file_t file, const void *buf, const off_t *offs,
 	    req_size = max_req_size;
 	  if (req_size > remaining)
 	    req_size = remaining;
-	  if (test->file_mode == IORE_TEST_FMODE_NXN)
-	    xferd = pvfs_pwrite (fd, buf, req_size, *offs);
-	  else
-	    xferd = pwrite (fd, buf, req_size, *offs);
+	  xferd = pwrite (fd, buf, req_size, *offs);
 	  if (xferd < (ssize_t) req_size)
 	    nbytes = -1;
 	  else
 	    {
 	      nbytes += xferd;
 	      if (test->write_flush_per_req)
-		{
-		  if (test->file_mode == IORE_TEST_FMODE_NXN)
-		    pvfs_fsync (fd);
-		  else
-		    fsync (fd);
-		}
+		fsync (fd);
 	    }
 	  remaining -= req_size;
 	  offs++;
@@ -180,11 +144,7 @@ ofsproto_write_oset (iore_file_t file, const void *buf, const off_t *offs,
     {
       while (remaining && nbytes >= 0)
 	{
-	  if (test->file_mode == IORE_TEST_FMODE_NXN
-	      && pvfs_lseek (fd, *offs, SEEK_SET) < 0)
-	    nbytes = -1;
-	  else if (test->file_mode == IORE_TEST_FMODE_NX1
-	      && lseek (fd, *offs, SEEK_SET) < 0)
+	  if (lseek (fd, *offs, SEEK_SET) < 0)
 	    nbytes = -1;
 	  else
 	    {
@@ -193,22 +153,14 @@ ofsproto_write_oset (iore_file_t file, const void *buf, const off_t *offs,
 		req_size = max_req_size;
 	      if (req_size > remaining)
 		req_size = remaining;
-	      if (test->file_mode == IORE_TEST_FMODE_NXN)
-		xferd = pvfs_write (fd, buf, req_size);
-	      else
-		xferd = write (fd, buf, req_size);
+	      xferd = write (fd, buf, req_size);
 	      if (xferd < (ssize_t) req_size)
 		nbytes = -1;
 	      else
 		{
 		  nbytes += xferd;
 		  if (test->write_flush_per_req)
-		    {
-		      if (test->file_mode == IORE_TEST_FMODE_NXN)
-			pvfs_fsync (fd);
-		      else
-			fsync (fd);
-		    }
+		    fsync (fd);
 		}
 	    }
 	  remaining -= req_size;
@@ -217,12 +169,7 @@ ofsproto_write_oset (iore_file_t file, const void *buf, const off_t *offs,
     }
 
   if (nbytes > 0 && test->write_flush)
-    {
-      if (test->file_mode == IORE_TEST_FMODE_NXN)
-	pvfs_fsync (fd);
-      else
-	fsync (fd);
-    }
+    fsync (fd);
 
   return nbytes;
 } /* ofsproto_write_oset () */
@@ -330,22 +277,14 @@ ofsproto_write_dset (iore_file_t file, const void *buf, const iore_test_t *test)
     {
       while (nbytes < (ssize_t) dset_size && nbytes >= 0)
 	{
-	  if (test->file_mode == IORE_TEST_FMODE_NXN)
-	    xferd = pvfs_pwrite (fd, buf + nbytes, req_size, *offs);
-	  else
-	    xferd = pwrite (fd, buf + nbytes, req_size, *offs);
+	  xferd = pwrite (fd, buf + nbytes, req_size, *offs);
 	  if (xferd < (ssize_t) req_size)
 	    nbytes = -1;
 	  else
 	    {
 	      nbytes += xferd;
 	      if (test->write_flush_per_req)
-		{
-		  if (test->file_mode == IORE_TEST_FMODE_NXN)
-		    pvfs_fsync (fd);
-		  else
-		    fsync (fd);
-		}
+		fsync (fd);
 	    }
 	  offs++;
 	}
@@ -354,30 +293,18 @@ ofsproto_write_dset (iore_file_t file, const void *buf, const iore_test_t *test)
     {
       while (nbytes < (ssize_t) dset_size && nbytes >= 0)
 	{
-	  if (test->file_mode == IORE_TEST_FMODE_NXN
-	      && pvfs_lseek (fd, *offs, SEEK_SET) < 0)
-	    nbytes = -1;
-	  if (test->file_mode == IORE_TEST_FMODE_NX1
-	      && lseek (fd, *offs, SEEK_SET) < 0)
+	  if (lseek (fd, *offs, SEEK_SET) < 0)
 	    nbytes = -1;
 	  else
 	    {
-	      if (test->file_mode == IORE_TEST_FMODE_NXN)
-		xferd = pvfs_write (fd, buf + nbytes, req_size);
-	      else
-		xferd = write (fd, buf + nbytes, req_size);
+	      xferd = write (fd, buf + nbytes, req_size);
 	      if (xferd < (ssize_t) req_size)
 		nbytes = -1;
 	      else
 		{
 		  nbytes += xferd;
 		  if (test->write_flush_per_req)
-		    {
-		      if (test->file_mode == IORE_TEST_FMODE_NXN)
-			pvfs_fsync (fd);
-		      else
-			fsync (fd);
-		    }
+		    fsync (fd);
 		}
 	    }
 	  offs++;
@@ -385,12 +312,7 @@ ofsproto_write_dset (iore_file_t file, const void *buf, const iore_test_t *test)
     }
 
   if (nbytes > 0 && test->write_flush)
-    {
-      if (test->file_mode == IORE_TEST_FMODE_NXN)
-	pvfs_fsync (fd);
-      else
-	fsync (fd);
-    }
+    fsync (fd);
 
   free (first_off);
 
@@ -479,3 +401,52 @@ ofsproto_remove (iore_file_t file)
 {
   return unlink (file.name);
 } /* ofsproto_remove () */
+
+/*** STATIC FUNCTIONS *********************************************************/
+
+static int
+ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
+		     mode_t mode)
+{
+  int nosts, first_ost, stride, fd;
+  int stripe_off;
+  PVFS_hint hint = NULL;
+  int layout = PVFS_SYS_LAYOUT_LIST;
+  /* TODO: get from AFSB parameters */
+  unsigned int num_dfiles = 1;
+  char *serverlist;
+  unsigned int *u_serverlist;
+
+  /* TODO: use OrangeFS API to get the number of data servers */
+  nosts = atoi (getenv ("OFS_NUM_DSERV"));
+  if (ctx.task_id == IORE_MASTER_TASK)
+    {
+      /* TODO: replace RNG */
+      first_ost = rand () % nosts;
+    }
+  MPI_Bcast (&first_ost, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  stride = nosts / test->wkld.num_tasks;
+  if (stride < 1)
+    stride = 1;
+  stripe_off = (first_ost + ctx.task_id * stride) % nosts;
+
+  u_serverlist = calloc (num_dfiles + 1, sizeof(unsigned int));
+  assert(u_serverlist);
+  u_serverlist[0] = num_dfiles;
+  u_serverlist[1] = stripe_off;
+  /* TODO: implement loop for num_dfiles > 1 */
+  serverlist = coallesce_uint (u_serverlist, num_dfiles + 1, ":");
+  free (u_serverlist);
+
+  PVFS_hint_add (&hint, PVFS_HINT_LAYOUT_NAME, sizeof(layout), &layout);
+  PVFS_hint_add (&hint, PVFS_HINT_DFILE_COUNT_NAME, sizeof(num_dfiles),
+		 &num_dfiles);
+  PVFS_hint_add (&hint, PVFS_HINT_SERVERLIST_NAME, strlen (serverlist),
+		 serverlist);
+
+  oflag |= O_HINTS;
+
+  fd = pvfs_open (file->name, oflag, mode, hint);
+
+  return fd;
+} /* ofsproto_create_nxn () */
