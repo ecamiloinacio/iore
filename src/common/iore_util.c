@@ -368,6 +368,8 @@ coallesce_str (const char **a, int len, char *sep)
 	  strncpy(str_ptr, a[i], s);
 	  str_ptr += s;
 	}
+
+      strncpy(str_ptr, '\0', 1);
     }
 
   return str;
