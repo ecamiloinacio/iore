@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 /* TODO: check if pvfs2.h and pvfs2-usrint.h is available */
 #include <pvfs2.h>
 #include <pvfs2-usrint.h>
@@ -56,13 +57,12 @@ ofsproto_create (iore_file_t *file, const iore_test_t *test)
   int oflag = O_CREAT | O_WRONLY;
   mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
   int stripe_off;
-  PVFS_hint hint;
+  PVFS_hint hint = NULL;
   int layout = PVFS_SYS_LAYOUT_LIST;
   /* TODO: get from AFSB parameters */
   unsigned int num_dfiles = 1;
   char *serverlist;
   unsigned int *u_serverlist;
-  int i;
 
   if (test->file_mode == IORE_TEST_FMODE_NXN)
     {

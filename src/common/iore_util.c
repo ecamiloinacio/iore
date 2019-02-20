@@ -369,7 +369,7 @@ coallesce_str (const char **a, int len, char *sep)
 	  str_ptr += s;
 	}
 
-      strncpy(str_ptr, '\0', 1);
+      *str_ptr = '\0';
     }
 
   return str;
@@ -389,7 +389,7 @@ coallesce_uint (const unsigned int *a, int len, char *sep)
       for (i = 0; i < len; i++)
 	str_a[i] = strfmt ("%u", a[i]);
 
-      str = coallesce_str (str_a, len, sep);
+      str = coallesce_str ((const char **) str_a, len, sep);
 
       for (i = 0; i < len; i++)
 	free (str_a[i]);
@@ -397,7 +397,7 @@ coallesce_uint (const unsigned int *a, int len, char *sep)
     }
 
   return str;
-} /* coallesce_uint ()
+} /* coallesce_uint () */
 
  /*** STATIC FUNCTIONS *********************************************************/
 
@@ -405,7 +405,7 @@ static char *
 vstrfmt (const char *fmt, va_list ap)
 {
   va_list copy;
-  char *str;
+  char *str = NULL;
   int len;
 
   va_copy (copy, ap);
