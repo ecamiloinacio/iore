@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <libgen.h>
 /* TODO: check if pvfs2.h and pvfs2-usrint.h is available */
 #include <pvfs2.h>
 #include <pvfs2-usrint.h>
@@ -413,13 +414,14 @@ ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
   PVFS_hint hint = NULL;
   int layout = PVFS_SYS_LAYOUT_LIST;
   char dfiles_xattr[8];
+  char *parent_dir;
   int num_dfiles;
   char *serverlist;
   unsigned int *u_serverlist;
 
   /* TODO: use OrangeFS API to get the number of datafiles (?) */
-  pvfs_getxattr (basename (file->name), "user.pvfs2.num_dfiles", dfiles_xattr,
-		 8);
+  parent_dir = dirname (strdup (file->name));
+  pvfs_getxattr (parent_dir, "user.pvfs2.num_dfiles", dfiles_xattr, 8);
   num_dfiles = atoi (dfiles_xattr);
   /* TODO: use OrangeFS API to get the number of data servers (?) */
   nosts = atoi (getenv ("OFS_NUM_DSERV"));
