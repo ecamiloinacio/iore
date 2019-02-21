@@ -412,12 +412,16 @@ ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
   int stripe_off;
   PVFS_hint hint = NULL;
   int layout = PVFS_SYS_LAYOUT_LIST;
-  /* TODO: get from AFSB parameters */
-  unsigned int num_dfiles = 1;
+  char dfiles_xattr[8];
+  int num_dfiles;
   char *serverlist;
   unsigned int *u_serverlist;
 
-  /* TODO: use OrangeFS API to get the number of data servers */
+  /* TODO: use OrangeFS API to get the number of datafiles (?) */
+  pvfs_getxattr (basename (file->name), "user.pvfs2.num_dfiles", dfiles_xattr,
+		 8);
+  num_dfiles = atoi (dfiles_xattr);
+  /* TODO: use OrangeFS API to get the number of data servers (?) */
   nosts = atoi (getenv ("OFS_NUM_DSERV"));
   if (ctx.task_id == IORE_MASTER_TASK)
     {
