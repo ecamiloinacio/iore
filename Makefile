@@ -40,7 +40,7 @@ CFLAGS += -I $(LIBDIR)/tinymt
 CFLAGS += -I $(LIBDIR)/json-parser
 CFLAGS += -std=gnu99
 CFLAGS += -lm
-CFLAGS += -I /opt/orangefs/include -D_GNU_SOURCE
+CFLAGS += -I /opt/orangefs/include -D_GNU_SOURCE -L /opt/orangefs/lib -lorangefs -lpvfs2
 
 ifeq ($(WITH_MPIIO_AFIO), true)
 	CFLAGS += -DWITH_MPIIO_AFIO

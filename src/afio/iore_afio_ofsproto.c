@@ -12,8 +12,8 @@
 #include <string.h>
 #include <libgen.h>
 /* TODO: check if pvfs2.h and pvfs2-usrint.h is available */
-#include <pvfs2.h>
-#include <pvfs2-usrint.h>
+#include <orange.h>
+#include <pvfs2-hint.h>
 
 #include "iore_afio.h"
 #include "iore_error.h"
