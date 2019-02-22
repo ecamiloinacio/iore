@@ -14,6 +14,7 @@
 #define AFIO_PARAM_SEEK_RW_SINGLE_OP "seek_rw_single_op"
 #define AFIO_PARAM_COLLECTIVE_IO "collective_io"
 #define AFIO_PARAM_FILE_VIEW "file_view"
+#define AFIO_PARAM_STRIPE_WIDTH "stripe_width"
 
 #define AFIO2STR_FORMAT "iore_afio_t (%p) { type = '%s', params = %s }"
 
