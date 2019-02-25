@@ -425,7 +425,7 @@ ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
       /* TODO: replace RNG */
       first_ost = rand () % nosts;
     }
-  MPI_Bcast (&first_ost, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  MPI_Bcast (&first_ost, 1, MPI_INT, 0, ctx.comm);
   stride = nosts / test->wkld.num_tasks;
   if (stride < 1)
     stride = 1;
