@@ -409,7 +409,7 @@ static int
 ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
 		     mode_t mode)
 {
-  int nosts, first_ost, stride, fd;
+  int nosts, first_ost, stride, fd, i;
   int stripe_off;
   PVFS_hint hint = NULL;
   int layout = PVFS_SYS_LAYOUT_LIST;
@@ -435,7 +435,11 @@ ofsproto_create_nxn (iore_file_t *file, const iore_test_t *test, int oflag,
   assert(u_serverlist);
   u_serverlist[0] = num_dfiles;
   u_serverlist[1] = stripe_off;
-  /* TODO: implement loop for num_dfiles > 1 */
+  for (i = 2; i <= num_dfiles; i++)
+    {
+      stripe_off = (stripe_off + 1) % nosts;
+      u_serverlist[i] = stripe_off;
+    }
   serverlist = coallesce_uint (u_serverlist, num_dfiles + 1, ":");
   free (u_serverlist);
 
